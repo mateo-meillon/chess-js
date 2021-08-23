@@ -4,7 +4,7 @@ This project is simply an online chess board. Everyone should be able to play wi
 
 ### Known issues
 - When the size of the window is changed, the positions of the figures change. Are therefore no longer on their squares
-- The position of the figures when dragging must be calculated correctly again
+- (fixed) The position of the figures when dragging must be calculated correctly again
 
 ### Work in progress
 - Database connection

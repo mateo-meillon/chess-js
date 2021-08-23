@@ -93,8 +93,8 @@ function createFigure(id, k, wb, theme) {
         function myLoop() {
             setTimeout(function() {
                 if (!fig.classList.contains('moving')) return;
-                fig.style.top = mouseY - window.innerHeight * 0.1 - (window.innerHeight / 8) * 0.5  + 'px'
-                fig.style.left = mouseX - (window.innerWidth - (window.innerHeight * 0.8)) * 0.5 - (((window.innerWidth - (window.innerHeight * 0.8)) / 8) * 0.5) + 'px'
+                fig.style.top = mouseY - ((window.innerHeight * 0.1) + ((window.innerHeight * 0.8) / 8) / 2) + 'px'
+                fig.style.left = mouseX - (((window.innerWidth - (window.innerHeight * 0.8)) / 2) + ((window.innerHeight * 0.8) / 8) / 2) + 'px'
                 myLoop()
             }, 1)
         }
