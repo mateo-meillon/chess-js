@@ -39,6 +39,9 @@ let themes = [
     }
 ]
 
+let move = new Audio('sounds/move.mp3');
+let die = new Audio('sounds/die.mp3');
+
 // Erstellt das Schachbrettmuster
 let alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 alphabet.forEach(b => {
@@ -113,6 +116,9 @@ function createFigure(id, k, wb, theme) {
             // Findet den eigentlichen Kasten
             aField = document.elementFromPoint(x, y);
             console.log("New aField:\n", aField)
+            die.play()
+        } else {
+            move.play()
         }
         fig.style.display = 'flex'
         fig.style.top = aField.offsetTop + 'px'
