@@ -84,8 +84,31 @@ function createFigure(id, k, wb, theme) {
 
 
     let field = document.getElementById(id)
-    fig.style.top = field.offsetTop + 'px'
-    fig.style.left = field.offsetLeft + 'px'
+
+    let prozent = 0
+    let found = false
+    zeilen.forEach(zahl =>  {
+        if (zahl === parseInt(field.id.slice(1, 2))) {
+            found = true
+        } else {
+            if (found === true) return
+            prozent = prozent + 12.5
+        }
+    })
+    fig.style.top = prozent + '%'
+
+    prozent = 0
+    found = false
+    alphabet.forEach(alp => {
+        if (alp === field.id.slice(0, 1)) {
+            found = true
+        } else {
+            if (found === true) return
+            prozent = prozent + 12.5
+        }
+    })
+
+    fig.style.left = prozent + '%'
 
     root.appendChild(fig)
 
@@ -119,7 +142,30 @@ function createFigure(id, k, wb, theme) {
         } else
             move.play()
         fig.style.display = 'flex'
-        fig.style.top = aField.offsetTop + 'px'
-        fig.style.left = aField.offsetLeft + 'px'
+
+        prozent = 0
+        found = false
+        zeilen.forEach(zahl =>  {
+            if (zahl === parseInt(aField.id.slice(1, 2))) {
+                found = true
+            } else {
+                if (found === true) return
+                prozent = prozent + 12.5
+            }
+        })
+        fig.style.top = prozent + '%'
+
+        prozent = 0
+        found = false
+        alphabet.forEach(alp => {
+            if (alp === aField.id.slice(0, 1)) {
+                found = true
+            } else {
+                if (found === true) return
+                prozent = prozent + 12.5
+            }
+        })
+
+        fig.style.left = prozent + '%'
     })
 }
