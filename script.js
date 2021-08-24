@@ -145,29 +145,34 @@ function createFigure(id, k, wb, theme) {
             move.play()
         fig.style.display = 'flex'
 
-        prozent = 0
-        found = false
-        zeilen.forEach(zahl =>  {
-            if (zahl === parseInt(aField.id.slice(1, 2))) {
-                found = true
-            } else {
-                if (found === true) return
-                prozent = prozent + 12.5
-            }
-        })
-        fig.style.top = prozent + '%'
-
-        prozent = 0
-        found = false
-        alphabet.forEach(alp => {
-            if (alp === aField.id.slice(0, 1)) {
-                found = true
-            } else {
-                if (found === true) return
-                prozent = prozent + 12.5
-            }
-        })
-
-        fig.style.left = prozent + '%'
+        fig.style.top = getProzent(zeilen, aField, 1, 2, 'number')
+        fig.style.left = getProzent(alphabet, aField, 0, 1, 'string')
     })
 }
+
+function getProzent(array, field, a, b, lol) {
+    let prozent = 0
+    let found = false
+    array.forEach(zahl =>  {
+        if (lol == 'number') {
+            if (zahl === parseInt(field.id.slice(a, b)))
+                found = true
+            else {
+                if (found === true) return
+                prozent = prozent + 12.5
+            }
+        } else {
+            if (zahl === field.id.slice(a, b))
+                found = true
+            else {
+                if (found === true) return
+                prozent = prozent + 12.5
+            }
+        }
+    })
+    return prozent + '%'
+}
+
+document.addEventListener('contextmenu', (event) => {
+    event.preventDefault()
+})
