@@ -42,6 +42,8 @@ let themes = [
 let move = new Audio('sounds/move.mp3');
 let die = new Audio('sounds/die.mp3');
 
+let last
+
 // Erstellt das Schachbrettmuster
 let alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 let zeilen = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -76,7 +78,7 @@ figures.forEach(figure => {
 function createFigure(id, k, wb, theme) {
     let fig = document.createElement('div')
     fig.classList.add('figure')
-    fig.id = id
+    fig.id = id + k
     if (wb === 'white')
         fig.style.backgroundImage = `url(${themes[theme].white.find(t => t.fig === k).src})`
     else
