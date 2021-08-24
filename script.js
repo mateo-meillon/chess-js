@@ -1,21 +1,21 @@
 let root = document.getElementById('root')
 let figures = [
-    {name: 'Turm', k: 't', startw: 'a1', startb: 'h1'},
-    {name: 'Pferd', k: 'p', startw: 'a2', startb: 'h2'},
-    {name: 'Läufer', k: 'l', startw: 'a3', startb: 'h3'},
-    {name: 'Dame', k: 'd', startw: 'a4', startb: 'h4'},
-    {name: 'König', k: 'k', startw: 'a5', startb: 'h5'},
-    {name: 'Läufer', k: 'l', startw: 'a6', startb: 'h6'},
-    {name: 'Pferd', k: 'p', startw: 'a7', startb: 'h7'},
-    {name: 'Turm', k: 't', startw: 'a8', startb: 'h8'},
-    {name: 'Bauer', k: 'b', startw: 'b1', startb: 'g1'},
-    {name: 'Bauer', k: 'b', startw: 'b2', startb: 'g2'},
-    {name: 'Bauer', k: 'b', startw: 'b3', startb: 'g3'},
-    {name: 'Bauer', k: 'b', startw: 'b4', startb: 'g4'},
-    {name: 'Bauer', k: 'b', startw: 'b5', startb: 'g5'},
-    {name: 'Bauer', k: 'b', startw: 'b6', startb: 'g6'},
-    {name: 'Bauer', k: 'b', startw: 'b7', startb: 'g7'},
-    {name: 'Bauer', k: 'b', startw: 'b8', startb: 'g8'}
+    {name: 'Turm', k: 't', startb: 'a1', startw: 'a8'},
+    {name: 'Pferd', k: 'p', startb: 'b1', startw: 'b8'},
+    {name: 'Läufer', k: 'l', startb: 'c1', startw: 'c8'},
+    {name: 'Dame', k: 'd', startb: 'd1', startw: 'd8'},
+    {name: 'König', k: 'k', startb: 'e1', startw: 'e8'},
+    {name: 'Läufer', k: 'l', startb: 'f1', startw: 'f8'},
+    {name: 'Pferd', k: 'p', startb: 'g1', startw: 'g8'},
+    {name: 'Turm', k: 't', startb: 'h1', startw: 'h8'},
+    {name: 'Bauer', k: 'b', startb: 'a2', startw: 'a7'},
+    {name: 'Bauer', k: 'b', startb: 'b2', startw: 'b7'},
+    {name: 'Bauer', k: 'b', startb: 'c2', startw: 'c7'},
+    {name: 'Bauer', k: 'b', startb: 'd2', startw: 'd7'},
+    {name: 'Bauer', k: 'b', startb: 'e2', startw: 'e7'},
+    {name: 'Bauer', k: 'b', startb: 'f2', startw: 'f7'},
+    {name: 'Bauer', k: 'b', startb: 'g2', startw: 'g7'},
+    {name: 'Bauer', k: 'b', startb: 'h2', startw: 'h7'}
 ]
 let themes = [
     {
@@ -44,18 +44,19 @@ let die = new Audio('sounds/die.mp3');
 
 // Erstellt das Schachbrettmuster
 let alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-alphabet.forEach(b => {
+let zeilen = [1, 2, 3, 4, 5, 6, 7, 8]
+zeilen.forEach(i => {
     let white = 1
-    if (b === 'a'||b === 'c'||b === 'e'||b === 'g')
+    if (i === 1||i === 3||i === 5||i === 7)
         white = 2
-    for (let i = 1; i < 9; i++) {
+    alphabet.forEach(b => {
         let field = document.createElement('div')
         field.id = b + i
         field.classList.add('field')
         if (white % 2 === 0) field.classList.add('white')
         root.appendChild(field)
         white++
-    }
+    })
 })
 
 let mouseX
@@ -68,10 +69,8 @@ document.addEventListener('mousemove', (event) => {
 
 // Generates the Figures on Brett
 figures.forEach(figure => {
-    // White
-    createFigure(figure.startw, figure.k, 'white', 0)
-    // Black
     createFigure(figure.startb, figure.k, 'black', 0)
+    createFigure(figure.startw, figure.k, 'white', 0)
 })
 
 function createFigure(id, k, wb, theme) {
@@ -117,9 +116,8 @@ function createFigure(id, k, wb, theme) {
             aField = document.elementFromPoint(x, y);
             console.log("New aField:\n", aField)
             die.play()
-        } else {
+        } else
             move.play()
-        }
         fig.style.display = 'flex'
         fig.style.top = aField.offsetTop + 'px'
         fig.style.left = aField.offsetLeft + 'px'
