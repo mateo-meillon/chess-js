@@ -32,6 +32,7 @@ html {
     cursor: grab;
     transition: background-size 200ms;
     background-size: calc(80vh / 8);
+    background-repeat: no-repeat;
 }
 .moving {
     z-index: 10;
