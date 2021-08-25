@@ -42,9 +42,7 @@ let themes = [
 let move = new Audio('sounds/move.mp3');
 let die = new Audio('sounds/die.mp3');
 
-let last
-
-// Erstellt das Schachbrettmuster
+// Creates the chessboard pattern
 let alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 let zeilen = [1, 2, 3, 4, 5, 6, 7, 8]
 zeilen.forEach(i => {
@@ -69,7 +67,7 @@ document.addEventListener('mousemove', (event) => {
     }
 )
 
-// Generates the Figures on Brett
+// Creates the Figures on the chessboard
 figures.forEach(figure => {
     createFigure(figure.startb, figure.k, 'black', 0)
     createFigure(figure.startw, figure.k, 'white', 0)
@@ -131,25 +129,24 @@ function createFigure(id, k, wb, theme) {
         fig.style.display = 'none'
         let x = event.clientX, y = event.clientY
         let aField = document.elementFromPoint(x, y);
-        // Falls schon ein Spieler auf dem Feld ist, wird dieser gelöscht
+        // If there is already a player on the field, it will be deleted
         if (aField.classList.contains('figure')) {
             console.log("Removed:\n", aField)
-            // Hier wird er gelöscht (Der richtige Lösch Vorgang wird beim updaten der db gemacht)
-            //db.ref().child('Died').child(aField.id).set({ delete: true })
             root.removeChild(aField)
-            // Findet den eigentlichen Kasten
+            // Finds the actual field
             aField = document.elementFromPoint(x, y);
             console.log("New aField:\n", aField)
             die.play()
         } else
             move.play()
         fig.style.display = 'flex'
-
         fig.style.top = getProzent(zeilen, aField, 1, 2, 'number')
         fig.style.left = getProzent(alphabet, aField, 0, 1, 'string')
     })
 }
 
+
+// Return the top and left px to %
 function getProzent(array, field, a, b, lol) {
     let prozent = 0
     let found = false
