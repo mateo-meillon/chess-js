@@ -84,6 +84,7 @@ function createFigure(id, k, wb, theme) {
 
 
     let field = document.getElementById(id)
+    field.classList.add('besetzt')
 
     let prozent = 0
     let found = false
@@ -95,6 +96,7 @@ function createFigure(id, k, wb, theme) {
             prozent = prozent + 12.5
         }
     })
+
     fig.style.top = prozent + '%'
 
     prozent = 0
@@ -114,6 +116,11 @@ function createFigure(id, k, wb, theme) {
 
     fig.addEventListener('mousedown', event => {
         fig.classList.add('moving')
+        fig.style.display = 'none'
+        let x = event.clientX, y = event.clientY
+        let field = document.elementFromPoint(x, y);
+        field.classList.remove('besetzt')
+        fig.style.display = 'flex'
         myLoop()
         function myLoop() {
             setTimeout(function() {
@@ -128,20 +135,21 @@ function createFigure(id, k, wb, theme) {
         fig.classList.remove('moving')
         fig.style.display = 'none'
         let x = event.clientX, y = event.clientY
-        let aField = document.elementFromPoint(x, y);
+        let field = document.elementFromPoint(x, y);
         // If there is already a player on the field, it will be deleted
-        if (aField.classList.contains('figure')) {
-            console.log("Removed:\n", aField)
-            root.removeChild(aField)
+        if (field.classList.contains('figure')) {
+            console.log("Removed:\n", field)
+            root.removeChild(field)
             // Finds the actual field
-            aField = document.elementFromPoint(x, y);
-            console.log("New aField:\n", aField)
+            field = document.elementFromPoint(x, y);
+            console.log("New aField:\n", field)
             die.play()
         } else
             move.play()
+        field.classList.add('besetzt')
         fig.style.display = 'flex'
-        fig.style.top = getProzent(zeilen, aField, 1, 2, 'number')
-        fig.style.left = getProzent(alphabet, aField, 0, 1, 'string')
+        fig.style.top = getProzent(zeilen, field, 1, 2, 'number')
+        fig.style.left = getProzent(alphabet, field, 0, 1, 'string')
     })
 }
 
@@ -169,7 +177,3 @@ function getProzent(array, field, a, b, lol) {
     })
     return prozent + '%'
 }
-
-document.addEventListener('contextmenu', (event) => {
-    event.preventDefault()
-})

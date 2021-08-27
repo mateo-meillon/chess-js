@@ -1,5 +1,6 @@
 html {
     background-color: #11111a;
+    overflow: hidden;
 }
 .body {
     height: 100vh;
