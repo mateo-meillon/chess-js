@@ -5,11 +5,32 @@ const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 const zeilen = Array.from({ length: BOARD_SIZE }, (_, i) => i + 1)
 
 // Performance optimizations
-const BOARD_OFFSET = {
+let BOARD_OFFSET = {
 	x: (window.innerWidth - window.innerHeight * 0.8) / 2,
 	y: window.innerHeight * 0.1,
 }
-const PIECE_SIZE = (window.innerHeight * 0.8) / 8
+let PIECE_SIZE = (window.innerHeight * 0.8) / 8
+
+// Update board dimensions on resize
+function updateBoardDimensions() {
+	BOARD_OFFSET = {
+		x: (window.innerWidth - window.innerHeight * 0.8) / 2,
+		y: window.innerHeight * 0.1,
+	}
+	PIECE_SIZE = (window.innerHeight * 0.8) / 8
+
+	// Update all piece positions
+	document.querySelectorAll('.figure').forEach((fig) => {
+		const position = fig.id.slice(0, 2)
+		const row = parseInt(position.slice(1))
+		const col = position.slice(0, 1)
+		fig.style.top = `${calculatePosition(row, zeilen)}%`
+		fig.style.left = `${calculatePosition(col, alphabet)}%`
+	})
+}
+
+// Add resize event listener
+window.addEventListener('resize', updateBoardDimensions)
 
 // Cache DOM elements
 const root = document.getElementById('root')
@@ -21,22 +42,22 @@ moveSound.load()
 dieSound.load()
 
 let figures = [
-	{ name: 'Rook', k: 'r', startb: 'a1', startw: 'a8' },
-	{ name: 'Knight', k: 'n', startb: 'b1', startw: 'b8' },
-	{ name: 'Bishop', k: 'b', startb: 'c1', startw: 'c8' },
-	{ name: 'Queen', k: 'q', startb: 'd1', startw: 'd8' },
-	{ name: 'King', k: 'k', startb: 'e1', startw: 'e8' },
-	{ name: 'Bishop', k: 'b', startb: 'f1', startw: 'f8' },
-	{ name: 'Knight', k: 'n', startb: 'g1', startw: 'g8' },
-	{ name: 'Rook', k: 'r', startb: 'h1', startw: 'h8' },
-	{ name: 'Pawn', k: 'p', startb: 'a2', startw: 'a7' },
-	{ name: 'Pawn', k: 'p', startb: 'b2', startw: 'b7' },
-	{ name: 'Pawn', k: 'p', startb: 'c2', startw: 'c7' },
-	{ name: 'Pawn', k: 'p', startb: 'd2', startw: 'd7' },
-	{ name: 'Pawn', k: 'p', startb: 'e2', startw: 'e7' },
-	{ name: 'Pawn', k: 'p', startb: 'f2', startw: 'f7' },
-	{ name: 'Pawn', k: 'p', startb: 'g2', startw: 'g7' },
-	{ name: 'Pawn', k: 'p', startb: 'h2', startw: 'h7' },
+	{ name: 'Rook', k: 'r', startB: 'a1', startW: 'a8' },
+	{ name: 'Knight', k: 'n', startB: 'b1', startW: 'b8' },
+	{ name: 'Bishop', k: 'b', startB: 'c1', startW: 'c8' },
+	{ name: 'Queen', k: 'q', startB: 'd1', startW: 'd8' },
+	{ name: 'King', k: 'k', startB: 'e1', startW: 'e8' },
+	{ name: 'Bishop', k: 'b', startB: 'f1', startW: 'f8' },
+	{ name: 'Knight', k: 'n', startB: 'g1', startW: 'g8' },
+	{ name: 'Rook', k: 'r', startB: 'h1', startW: 'h8' },
+	{ name: 'Pawn', k: 'p', startB: 'a2', startW: 'a7' },
+	{ name: 'Pawn', k: 'p', startB: 'b2', startW: 'b7' },
+	{ name: 'Pawn', k: 'p', startB: 'c2', startW: 'c7' },
+	{ name: 'Pawn', k: 'p', startB: 'd2', startW: 'd7' },
+	{ name: 'Pawn', k: 'p', startB: 'e2', startW: 'e7' },
+	{ name: 'Pawn', k: 'p', startB: 'f2', startW: 'f7' },
+	{ name: 'Pawn', k: 'p', startB: 'g2', startW: 'g7' },
+	{ name: 'Pawn', k: 'p', startB: 'h2', startW: 'h7' },
 ]
 
 // Board creation
@@ -75,9 +96,14 @@ document.addEventListener('mousemove', (event) => {
 
 // Creates the Figures on the chessboard
 figures.forEach((figure) => {
-	createFigure(figure.startb, figure.k, 'black', 0)
-	createFigure(figure.startw, figure.k, 'white', 0)
+	createFigure(figure.startB, figure.k, 'black', 0)
+	createFigure(figure.startW, figure.k, 'white', 0)
 })
+
+// Get all occupied positions
+function getOccupiedPositions() {
+	return Array.from(document.querySelectorAll('.occupied')).map((field) => field.id)
+}
 
 function createFigure(id, k, wb) {
 	const fig = document.createElement('div')
@@ -120,6 +146,21 @@ function createFigure(id, k, wb) {
 		const field = document.elementFromPoint(event.clientX, event.clientY)
 		field.classList.remove('occupied')
 
+		// Get valid moves for the piece using current position
+		const pieceType = k
+		const color = fig.getAttribute('data-color')
+		const currentPosition = fig.id.slice(0, 2) // Get current position from ID
+		console.log('Current piece position:', currentPosition)
+
+		const occupiedPositions = getOccupiedPositions()
+		console.log('Current occupied positions:', occupiedPositions)
+
+		const validMoves = getValidMoves(currentPosition, pieceType, color, occupiedPositions)
+		console.log('Valid moves:', validMoves)
+
+		// Highlight valid moves
+		highlightValidMoves(validMoves)
+
 		fig.style.display = 'flex'
 		updatePosition()
 	})
@@ -129,15 +170,41 @@ function createFigure(id, k, wb) {
 		fig.classList.remove('moving')
 		cancelAnimationFrame(animationFrame)
 
+		// Remove valid move highlights
+		document.querySelectorAll('.valid-move').forEach((el) => {
+			el.classList.remove('valid-move')
+		})
+
 		fig.style.display = 'none'
 		let field = document.elementFromPoint(event.clientX, event.clientY)
 
+		// Check if the move is valid using current position
+		const pieceType = k
+		const color = fig.getAttribute('data-color')
+		const currentPosition = fig.id.slice(0, 2) // Get current position from ID
+		console.log('Validating move from position:', currentPosition)
+
+		const occupiedPositions = getOccupiedPositions()
+		const validMoves = getValidMoves(currentPosition, pieceType, color, occupiedPositions)
+		console.log('Valid moves for validation:', validMoves)
+
+		if (!validMoves.includes(field.id)) {
+			console.log('Invalid move, returning to original position')
+			// Invalid move, return to original position
+			const originalField = document.getElementById(currentPosition)
+			fig.style.display = 'flex'
+			fig.style.top = `${calculatePosition(parseInt(currentPosition.slice(1)), zeilen)}%`
+			fig.style.left = `${calculatePosition(currentPosition.slice(0, 1), alphabet)}%`
+			originalField.classList.add('occupied')
+			return
+		}
+
 		if (field.classList.contains('figure')) {
 			if (field.getAttribute('data-color') === fig.getAttribute('data-color')) {
-				const originalField = document.getElementById(id)
+				const originalField = document.getElementById(currentPosition)
 				fig.style.display = 'flex'
-				fig.style.top = `${calculatePosition(parseInt(id.slice(1)), zeilen)}%`
-				fig.style.left = `${calculatePosition(id.slice(0, 1), alphabet)}%`
+				fig.style.top = `${calculatePosition(parseInt(currentPosition.slice(1)), zeilen)}%`
+				fig.style.left = `${calculatePosition(currentPosition.slice(0, 1), alphabet)}%`
 				originalField.classList.add('occupied')
 				return
 			}
@@ -148,12 +215,18 @@ function createFigure(id, k, wb) {
 			moveSound.play()
 		}
 
+		// Update the piece's position and ID
+		const newPosition = field.id
+		fig.id = `${newPosition}${k}`
 		field.classList.add('occupied')
 		fig.style.display = 'flex'
 
-		const row = parseInt(field.id.slice(1))
-		const col = field.id.slice(0, 1)
+		const row = parseInt(newPosition.slice(1))
+		const col = newPosition.slice(0, 1)
 		fig.style.top = `${calculatePosition(row, zeilen)}%`
 		fig.style.left = `${calculatePosition(col, alphabet)}%`
+
+		// Update the piece's data attributes
+		fig.setAttribute('data-position', newPosition)
 	})
 }

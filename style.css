@@ -1,5 +1,5 @@
 html {
-	background-color: #11111a;
+	background-color: #22222c;
 	overflow: hidden;
 }
 .body {
@@ -9,20 +9,20 @@ html {
 #root {
 	width: 80vh;
 	aspect-ratio: 1/1;
-	box-shadow: 0 0 10px -3px black;
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	background-color: #13131c;
 }
 .field {
+	position: relative;
 	width: calc(80vh / 8);
 	aspect-ratio: 1/1;
 	float: left;
+	border-radius: 6px;
 }
 .white {
-	background-color: #222233;
+	background-color: #3a3a50;
 }
 .figure {
 	position: absolute;
@@ -40,4 +40,24 @@ html {
 }
 .occupied {
 	position: relative;
+}
+.valid-move {
+	position: relative;
+}
+
+.valid-move::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 35%;
+	height: 35%;
+	background-color: rgba(96, 105, 138, 0.3);
+	border-radius: 50%;
+	pointer-events: none;
+}
+
+.valid-move.occupied::after {
+	background-color: rgba(255, 0, 0, 0.3);
 }
