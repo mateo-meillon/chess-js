@@ -217,21 +217,9 @@ function createFigure(id, k, wb) {
 
 		let targetPosition
 		if (elementAtPoint.classList.contains('figure')) {
-			const capturedPiece = elementAtPoint
-			if (capturedPiece.getAttribute('data-color') === color) {
-				const originalField = document.getElementById(currentPosition)
-				fig.style.display = 'flex'
-				fig.style.top = `${calculatePosition(parseInt(currentPosition.slice(1)), zeilen)}%`
-				fig.style.left = `${calculatePosition(currentPosition.slice(0, 1), alphabet)}%`
-				originalField.classList.add('occupied')
-				return
-			}
-			targetPosition = capturedPiece.id.slice(0, 2)
-			root.removeChild(capturedPiece)
-			dieSound.play()
+			targetPosition = elementAtPoint.id.slice(0, 2)
 		} else {
 			targetPosition = elementAtPoint.id
-			moveSound.play()
 		}
 
 		if (!validMoves.includes(targetPosition)) {
@@ -241,6 +229,22 @@ function createFigure(id, k, wb) {
 			fig.style.left = `${calculatePosition(currentPosition.slice(0, 1), alphabet)}%`
 			originalField.classList.add('occupied')
 			return
+		}
+
+		if (elementAtPoint.classList.contains('figure')) {
+			const capturedPiece = elementAtPoint
+			if (capturedPiece.getAttribute('data-color') === color) {
+				const originalField = document.getElementById(currentPosition)
+				fig.style.display = 'flex'
+				fig.style.top = `${calculatePosition(parseInt(currentPosition.slice(1)), zeilen)}%`
+				fig.style.left = `${calculatePosition(currentPosition.slice(0, 1), alphabet)}%`
+				originalField.classList.add('occupied')
+				return
+			}
+			root.removeChild(capturedPiece)
+			dieSound.play()
+		} else {
+			moveSound.play()
 		}
 
 		const targetField = document.getElementById(targetPosition)
