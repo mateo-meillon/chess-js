@@ -145,6 +145,7 @@ function createFigure(id, k, wb) {
 
 		const field = document.elementFromPoint(event.clientX, event.clientY)
 		field.classList.remove('occupied')
+		field.classList.add('starting-position')
 
 		// Get valid moves for the piece using current position
 		const pieceType = k
@@ -170,9 +171,12 @@ function createFigure(id, k, wb) {
 		fig.classList.remove('moving')
 		cancelAnimationFrame(animationFrame)
 
-		// Remove valid move highlights
+		// Remove valid move highlights and starting position highlight
 		document.querySelectorAll('.valid-move').forEach((el) => {
 			el.classList.remove('valid-move')
+		})
+		document.querySelectorAll('.starting-position').forEach((el) => {
+			el.classList.remove('starting-position')
 		})
 
 		fig.style.display = 'none'
