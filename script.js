@@ -73,10 +73,32 @@ const createBoard = () => {
 			if ((isEvenRow && colIndex % 2 === 0) || (!isEvenRow && colIndex % 2 === 1)) {
 				field.classList.add('white')
 			}
+
+			// Add right-click handler
+			field.addEventListener('contextmenu', (event) => {
+				event.preventDefault() // Prevent default context menu
+				field.classList.toggle('right-click-highlight')
+			})
+
 			root.appendChild(field)
 		})
 	})
 }
+
+// Add global left-click handler to remove all red highlights
+document.addEventListener('mousedown', (event) => {
+	if (event.button === 0) {
+		// Left click
+		document.querySelectorAll('.right-click-highlight').forEach((field) => {
+			field.classList.remove('right-click-highlight')
+		})
+	}
+})
+
+// Prevent context menu globally
+document.addEventListener('contextmenu', (event) => {
+	event.preventDefault()
+})
 
 // Calculate position percentage
 const calculatePosition = (value, array) => {
@@ -139,6 +161,15 @@ function createFigure(id, k, wb) {
 	}
 
 	fig.addEventListener('mousedown', (event) => {
+		// Return if right click is pressed
+		if (event.button === 2) {
+			event.preventDefault() // Prevent default context menu
+			const currentPosition = fig.id.slice(0, 2) // Get current position from ID
+			const field = document.getElementById(currentPosition)
+			field.classList.toggle('right-click-highlight')
+			return
+		}
+
 		isMoving = true
 		fig.classList.add('moving')
 		fig.style.display = 'none'
@@ -151,13 +182,10 @@ function createFigure(id, k, wb) {
 		const pieceType = k
 		const color = fig.getAttribute('data-color')
 		const currentPosition = fig.id.slice(0, 2) // Get current position from ID
-		console.log('Current piece position:', currentPosition)
 
 		const occupiedPositions = getOccupiedPositions()
-		console.log('Current occupied positions:', occupiedPositions)
 
 		const validMoves = getValidMoves(currentPosition, pieceType, color, occupiedPositions)
-		console.log('Valid moves:', validMoves)
 
 		// Highlight valid moves
 		highlightValidMoves(validMoves)
@@ -186,14 +214,11 @@ function createFigure(id, k, wb) {
 		const pieceType = k
 		const color = fig.getAttribute('data-color')
 		const currentPosition = fig.id.slice(0, 2) // Get current position from ID
-		console.log('Validating move from position:', currentPosition)
 
 		const occupiedPositions = getOccupiedPositions()
 		const validMoves = getValidMoves(currentPosition, pieceType, color, occupiedPositions)
-		console.log('Valid moves for validation:', validMoves)
 
 		if (!validMoves.includes(field.id)) {
-			console.log('Invalid move, returning to original position')
 			// Invalid move, return to original position
 			const originalField = document.getElementById(currentPosition)
 			fig.style.display = 'flex'
