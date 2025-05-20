@@ -1,41 +1,43 @@
 html {
-    background-color: #11111a;
-    overflow: hidden;
+	background-color: #11111a;
+	overflow: hidden;
 }
 .body {
-    height: 100vh;
-    width: 100vw;
+	height: 100vh;
+	width: 100vw;
 }
 #root {
-    width: 80vh;
-    aspect-ratio: 1/1;
-    box-shadow: 0 0 10px -3px black;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #13131c;
+	width: 80vh;
+	aspect-ratio: 1/1;
+	box-shadow: 0 0 10px -3px black;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: #13131c;
 }
 .field {
-    width: calc(80vh / 8);
-    aspect-ratio: 1/1;
-    float: left;
+	width: calc(80vh / 8);
+	aspect-ratio: 1/1;
+	float: left;
 }
 .white {
-    background-color: #222233;
+	background-color: #222233;
 }
 .figure {
-    position: absolute;
-    width: calc(80vh / 8);
-    aspect-ratio: 1/1;
-    background-position: center;
-    // background-size: cover;
-    cursor: grab;
-    transition: background-size 200ms;
-    background-size: calc(80vh / 8);
-    background-repeat: no-repeat;
+	position: absolute;
+	width: calc(80vh / 8);
+	aspect-ratio: 1/1;
+	background-position: center;
+	cursor: grab;
+	transition: background-size 200ms;
+	background-size: calc(80vh / 8);
+	background-repeat: no-repeat;
 }
 .moving {
-    z-index: 10;
-    background-size: calc((80vh / 8) + 15%);
+	z-index: 10;
+	background-size: calc((80vh / 8) + 15%);
+}
+.occupied {
+	position: relative;
 }

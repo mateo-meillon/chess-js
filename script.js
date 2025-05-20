@@ -1,179 +1,159 @@
-let root = document.getElementById('root')
+// Constants
+const BOARD_SIZE = 8
+const FIELD_PERCENTAGE = 100 / BOARD_SIZE
+const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+const zeilen = Array.from({ length: BOARD_SIZE }, (_, i) => i + 1)
+
+// Performance optimizations
+const BOARD_OFFSET = {
+	x: (window.innerWidth - window.innerHeight * 0.8) / 2,
+	y: window.innerHeight * 0.1,
+}
+const PIECE_SIZE = (window.innerHeight * 0.8) / 8
+
+// Cache DOM elements
+const root = document.getElementById('root')
+const moveSound = new Audio('assets/sounds/move.mp3')
+const dieSound = new Audio('assets/sounds/die.mp3')
+
+// Preload sounds
+moveSound.load()
+dieSound.load()
+
 let figures = [
-    {name: 'Turm', k: 't', startb: 'a1', startw: 'a8'},
-    {name: 'Pferd', k: 'p', startb: 'b1', startw: 'b8'},
-    {name: 'Läufer', k: 'l', startb: 'c1', startw: 'c8'},
-    {name: 'Dame', k: 'd', startb: 'd1', startw: 'd8'},
-    {name: 'König', k: 'k', startb: 'e1', startw: 'e8'},
-    {name: 'Läufer', k: 'l', startb: 'f1', startw: 'f8'},
-    {name: 'Pferd', k: 'p', startb: 'g1', startw: 'g8'},
-    {name: 'Turm', k: 't', startb: 'h1', startw: 'h8'},
-    {name: 'Bauer', k: 'b', startb: 'a2', startw: 'a7'},
-    {name: 'Bauer', k: 'b', startb: 'b2', startw: 'b7'},
-    {name: 'Bauer', k: 'b', startb: 'c2', startw: 'c7'},
-    {name: 'Bauer', k: 'b', startb: 'd2', startw: 'd7'},
-    {name: 'Bauer', k: 'b', startb: 'e2', startw: 'e7'},
-    {name: 'Bauer', k: 'b', startb: 'f2', startw: 'f7'},
-    {name: 'Bauer', k: 'b', startb: 'g2', startw: 'g7'},
-    {name: 'Bauer', k: 'b', startb: 'h2', startw: 'h7'}
-]
-let themes = [
-    {
-        name: 'Modern',
-        white: [
-            {fig: 't', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wr.png'},
-            {fig: 'p', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wn.png'},
-            {fig: 'l', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wb.png'},
-            {fig: 'd', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wq.png'},
-            {fig: 'k', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wk.png'},
-            {fig: 'b', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png'},
-        ],
-        black: [
-            {fig: 't', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/br.png'},
-            {fig: 'p', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bn.png'},
-            {fig: 'l', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bb.png'},
-            {fig: 'd', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bq.png'},
-            {fig: 'k', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bk.png'},
-            {fig: 'b', src: 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png'},
-        ]
-    }
+	{ name: 'Rook', k: 'r', startb: 'a1', startw: 'a8' },
+	{ name: 'Knight', k: 'n', startb: 'b1', startw: 'b8' },
+	{ name: 'Bishop', k: 'b', startb: 'c1', startw: 'c8' },
+	{ name: 'Queen', k: 'q', startb: 'd1', startw: 'd8' },
+	{ name: 'King', k: 'k', startb: 'e1', startw: 'e8' },
+	{ name: 'Bishop', k: 'b', startb: 'f1', startw: 'f8' },
+	{ name: 'Knight', k: 'n', startb: 'g1', startw: 'g8' },
+	{ name: 'Rook', k: 'r', startb: 'h1', startw: 'h8' },
+	{ name: 'Pawn', k: 'p', startb: 'a2', startw: 'a7' },
+	{ name: 'Pawn', k: 'p', startb: 'b2', startw: 'b7' },
+	{ name: 'Pawn', k: 'p', startb: 'c2', startw: 'c7' },
+	{ name: 'Pawn', k: 'p', startb: 'd2', startw: 'd7' },
+	{ name: 'Pawn', k: 'p', startb: 'e2', startw: 'e7' },
+	{ name: 'Pawn', k: 'p', startb: 'f2', startw: 'f7' },
+	{ name: 'Pawn', k: 'p', startb: 'g2', startw: 'g7' },
+	{ name: 'Pawn', k: 'p', startb: 'h2', startw: 'h7' },
 ]
 
-let move = new Audio('sounds/move.mp3');
-let die = new Audio('sounds/die.mp3');
+// Board creation
+const createBoard = () => {
+	const rows = Array.from({ length: BOARD_SIZE }, (_, i) => i + 1)
 
-// Creates the chessboard pattern
-let alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-let zeilen = [1, 2, 3, 4, 5, 6, 7, 8]
-zeilen.forEach(i => {
-    let white = 1
-    if (i === 1||i === 3||i === 5||i === 7)
-        white = 2
-    alphabet.forEach(b => {
-        let field = document.createElement('div')
-        field.id = b + i
-        field.classList.add('field')
-        if (white % 2 === 0) field.classList.add('white')
-        root.appendChild(field)
-        white++
-    })
-})
-
-let mouseX
-let mouseY
-
-document.addEventListener('mousemove', (event) => {
-        mouseX = event.pageX, mouseY = event.pageY
-    }
-)
-
-// Creates the Figures on the chessboard
-figures.forEach(figure => {
-    createFigure(figure.startb, figure.k, 'black', 0)
-    createFigure(figure.startw, figure.k, 'white', 0)
-})
-
-function createFigure(id, k, wb, theme) {
-    let fig = document.createElement('div')
-    fig.classList.add('figure')
-    fig.id = id + k
-    if (wb === 'white')
-        fig.style.backgroundImage = `url(${themes[theme].white.find(t => t.fig === k).src})`
-    else
-        fig.style.backgroundImage = `url(${themes[theme].black.find(t => t.fig === k).src})`
-
-
-    let field = document.getElementById(id)
-    field.classList.add('besetzt')
-
-    let prozent = 0
-    let found = false
-    zeilen.forEach(zahl =>  {
-        if (zahl === parseInt(field.id.slice(1, 2))) {
-            found = true
-        } else {
-            if (found === true) return
-            prozent = prozent + 12.5
-        }
-    })
-
-    fig.style.top = prozent + '%'
-
-    prozent = 0
-    found = false
-    alphabet.forEach(alp => {
-        if (alp === field.id.slice(0, 1)) {
-            found = true
-        } else {
-            if (found === true) return
-            prozent = prozent + 12.5
-        }
-    })
-
-    fig.style.left = prozent + '%'
-
-    root.appendChild(fig)
-
-    fig.addEventListener('mousedown', event => {
-        fig.classList.add('moving')
-        fig.style.display = 'none'
-        let x = event.clientX, y = event.clientY
-        let field = document.elementFromPoint(x, y);
-        field.classList.remove('besetzt')
-        fig.style.display = 'flex'
-        myLoop()
-        function myLoop() {
-            setTimeout(function() {
-                if (!fig.classList.contains('moving')) return;
-                fig.style.top = mouseY - ((window.innerHeight * 0.1) + ((window.innerHeight * 0.8) / 8) / 2) + 'px'
-                fig.style.left = mouseX - (((window.innerWidth - (window.innerHeight * 0.8)) / 2) + ((window.innerHeight * 0.8) / 8) / 2) + 'px'
-                myLoop()
-            }, 1)
-        }
-    })
-    fig.addEventListener('mouseup', (event) => {
-        fig.classList.remove('moving')
-        fig.style.display = 'none'
-        let x = event.clientX, y = event.clientY
-        let field = document.elementFromPoint(x, y);
-        // If there is already a player on the field, it will be deleted
-        if (field.classList.contains('figure')) {
-            console.log("Removed:\n", field)
-            root.removeChild(field)
-            // Finds the actual field
-            field = document.elementFromPoint(x, y);
-            console.log("New aField:\n", field)
-            die.play()
-        } else
-            move.play()
-        field.classList.add('besetzt')
-        fig.style.display = 'flex'
-        fig.style.top = getProzent(zeilen, field, 1, 2, 'number')
-        fig.style.left = getProzent(alphabet, field, 0, 1, 'string')
-    })
+	rows.forEach((row) => {
+		const isEvenRow = row % 2 === 0
+		alphabet.forEach((col, colIndex) => {
+			const field = document.createElement('div')
+			field.id = `${col}${row}`
+			field.classList.add('field')
+			if ((isEvenRow && colIndex % 2 === 0) || (!isEvenRow && colIndex % 2 === 1)) {
+				field.classList.add('white')
+			}
+			root.appendChild(field)
+		})
+	})
 }
 
+// Calculate position percentage
+const calculatePosition = (value, array) => {
+	const index = array.indexOf(value)
+	return index !== -1 ? index * FIELD_PERCENTAGE : 0
+}
 
-// Return the top and left px to %
-function getProzent(array, field, a, b, lol) {
-    let prozent = 0
-    let found = false
-    array.forEach(zahl =>  {
-        if (lol == 'number') {
-            if (zahl === parseInt(field.id.slice(a, b)))
-                found = true
-            else {
-                if (found === true) return
-                prozent = prozent + 12.5
-            }
-        } else {
-            if (zahl === field.id.slice(a, b))
-                found = true
-            else {
-                if (found === true) return
-                prozent = prozent + 12.5
-            }
-        }
-    })
-    return prozent + '%'
+// Initialize board
+createBoard()
+
+// Mouse tracking
+let mouseX, mouseY
+document.addEventListener('mousemove', (event) => {
+	mouseX = event.pageX
+	mouseY = event.pageY
+})
+
+// Creates the Figures on the chessboard
+figures.forEach((figure) => {
+	createFigure(figure.startb, figure.k, 'black', 0)
+	createFigure(figure.startw, figure.k, 'white', 0)
+})
+
+function createFigure(id, k, wb) {
+	const fig = document.createElement('div')
+	fig.classList.add('figure')
+	fig.id = `${id}${k}`
+	fig.setAttribute('data-color', wb)
+
+	const themeData = `assets/pieces/${wb.slice(0, 1).toLowerCase()}${k}.png`
+	fig.style.backgroundImage = `url(${themeData})`
+
+	const field = document.getElementById(id)
+	field.classList.add('occupied')
+
+	// Set initial position
+	const row = parseInt(id.slice(1))
+	const col = id.slice(0, 1)
+	fig.style.top = `${calculatePosition(row, zeilen)}%`
+	fig.style.left = `${calculatePosition(col, alphabet)}%`
+
+	root.appendChild(fig)
+
+	// Movement handling
+	let isMoving = false
+	let animationFrame
+
+	const updatePosition = () => {
+		if (!isMoving) return
+
+		fig.style.top = `${mouseY - (BOARD_OFFSET.y + PIECE_SIZE / 2)}px`
+		fig.style.left = `${mouseX - (BOARD_OFFSET.x + PIECE_SIZE / 2)}px`
+
+		animationFrame = requestAnimationFrame(updatePosition)
+	}
+
+	fig.addEventListener('mousedown', (event) => {
+		isMoving = true
+		fig.classList.add('moving')
+		fig.style.display = 'none'
+
+		const field = document.elementFromPoint(event.clientX, event.clientY)
+		field.classList.remove('occupied')
+
+		fig.style.display = 'flex'
+		updatePosition()
+	})
+
+	fig.addEventListener('mouseup', (event) => {
+		isMoving = false
+		fig.classList.remove('moving')
+		cancelAnimationFrame(animationFrame)
+
+		fig.style.display = 'none'
+		let field = document.elementFromPoint(event.clientX, event.clientY)
+
+		if (field.classList.contains('figure')) {
+			if (field.getAttribute('data-color') === fig.getAttribute('data-color')) {
+				const originalField = document.getElementById(id)
+				fig.style.display = 'flex'
+				fig.style.top = `${calculatePosition(parseInt(id.slice(1)), zeilen)}%`
+				fig.style.left = `${calculatePosition(id.slice(0, 1), alphabet)}%`
+				originalField.classList.add('occupied')
+				return
+			}
+			root.removeChild(field)
+			field = document.elementFromPoint(event.clientX, event.clientY)
+			dieSound.play()
+		} else {
+			moveSound.play()
+		}
+
+		field.classList.add('occupied')
+		fig.style.display = 'flex'
+
+		const row = parseInt(field.id.slice(1))
+		const col = field.id.slice(0, 1)
+		fig.style.top = `${calculatePosition(row, zeilen)}%`
+		fig.style.left = `${calculatePosition(col, alphabet)}%`
+	})
 }
