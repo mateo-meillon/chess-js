@@ -199,7 +199,6 @@ function createFigure(id, k, wb) {
 		fig.classList.remove('moving')
 		cancelAnimationFrame(animationFrame)
 
-		// Remove valid move highlights and starting position highlight
 		document.querySelectorAll('.valid-move').forEach((el) => {
 			el.classList.remove('valid-move')
 		})
@@ -208,18 +207,34 @@ function createFigure(id, k, wb) {
 		})
 
 		fig.style.display = 'none'
-		let field = document.elementFromPoint(event.clientX, event.clientY)
+		const elementAtPoint = document.elementFromPoint(event.clientX, event.clientY)
 
-		// Check if the move is valid using current position
 		const pieceType = k
 		const color = fig.getAttribute('data-color')
-		const currentPosition = fig.id.slice(0, 2) // Get current position from ID
-
+		const currentPosition = fig.id.slice(0, 2)
 		const occupiedPositions = getOccupiedPositions()
 		const validMoves = getValidMoves(currentPosition, pieceType, color, occupiedPositions)
 
-		if (!validMoves.includes(field.id)) {
-			// Invalid move, return to original position
+		let targetPosition
+		if (elementAtPoint.classList.contains('figure')) {
+			const capturedPiece = elementAtPoint
+			if (capturedPiece.getAttribute('data-color') === color) {
+				const originalField = document.getElementById(currentPosition)
+				fig.style.display = 'flex'
+				fig.style.top = `${calculatePosition(parseInt(currentPosition.slice(1)), zeilen)}%`
+				fig.style.left = `${calculatePosition(currentPosition.slice(0, 1), alphabet)}%`
+				originalField.classList.add('occupied')
+				return
+			}
+			targetPosition = capturedPiece.id.slice(0, 2)
+			root.removeChild(capturedPiece)
+			dieSound.play()
+		} else {
+			targetPosition = elementAtPoint.id
+			moveSound.play()
+		}
+
+		if (!validMoves.includes(targetPosition)) {
 			const originalField = document.getElementById(currentPosition)
 			fig.style.display = 'flex'
 			fig.style.top = `${calculatePosition(parseInt(currentPosition.slice(1)), zeilen)}%`
@@ -228,34 +243,16 @@ function createFigure(id, k, wb) {
 			return
 		}
 
-		if (field.classList.contains('figure')) {
-			if (field.getAttribute('data-color') === fig.getAttribute('data-color')) {
-				const originalField = document.getElementById(currentPosition)
-				fig.style.display = 'flex'
-				fig.style.top = `${calculatePosition(parseInt(currentPosition.slice(1)), zeilen)}%`
-				fig.style.left = `${calculatePosition(currentPosition.slice(0, 1), alphabet)}%`
-				originalField.classList.add('occupied')
-				return
-			}
-			root.removeChild(field)
-			field = document.elementFromPoint(event.clientX, event.clientY)
-			dieSound.play()
-		} else {
-			moveSound.play()
-		}
-
-		// Update the piece's position and ID
-		const newPosition = field.id
-		fig.id = `${newPosition}${k}`
-		field.classList.add('occupied')
+		const targetField = document.getElementById(targetPosition)
+		fig.id = `${targetPosition}${k}`
+		targetField.classList.add('occupied')
 		fig.style.display = 'flex'
 
-		const row = parseInt(newPosition.slice(1))
-		const col = newPosition.slice(0, 1)
+		const row = parseInt(targetPosition.slice(1))
+		const col = targetPosition.slice(0, 1)
 		fig.style.top = `${calculatePosition(row, zeilen)}%`
 		fig.style.left = `${calculatePosition(col, alphabet)}%`
 
-		// Update the piece's data attributes
-		fig.setAttribute('data-position', newPosition)
+		fig.setAttribute('data-position', targetPosition)
 	})
 }

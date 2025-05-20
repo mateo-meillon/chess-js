@@ -31,30 +31,22 @@ function isPositionOccupied(position, occupiedPositions) {
 // Helper function to check if a position is occupied by an opponent
 function isOpponentPosition(position, occupiedPositions, currentColor) {
 	const field = document.getElementById(position)
-	console.log('Checking opponent position:', { position, field, currentColor })
 
 	if (!field) {
-		console.log('Field not found')
 		return false
 	}
 
 	if (!field.classList.contains('occupied')) {
-		console.log('Field not occupied')
 		return false
 	}
 
-	// Find the figure element that is a direct child of the field
-	const figure = Array.from(field.children).find((child) => child.classList.contains('figure'))
+	const figure = document.querySelector(`.figure[id^="${position}"]`)
 	if (!figure) {
-		console.log('No figure found in occupied field')
 		return false
 	}
 
 	const figureColor = figure.getAttribute('data-color')
-	const isOpponent = figureColor !== currentColor
-	console.log('Figure color check:', { figureColor, currentColor, isOpponent })
-
-	return isOpponent
+	return figureColor !== currentColor
 }
 
 // Get valid moves for a pawn
